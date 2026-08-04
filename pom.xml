@@ -6,7 +6,7 @@
 
   <groupId>io.github.jiankn</groupId>
   <artifactId>pinterest-url-normalizer</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1</version>
   <name>Pinterest URL Normalizer</name>
   <description>Parse, classify, and normalize Pinterest URLs without network requests.</description>
   <url>https://savepinner.com/pinterest-downloader/</url>
