@@ -8,7 +8,7 @@ credentials, non-HTTPS URLs, encoded paths, and non-standard ports.
 <dependency>
   <groupId>io.github.jiankn</groupId>
   <artifactId>pinterest-url-normalizer</artifactId>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
 </dependency>
 ```
 
@@ -23,7 +23,7 @@ String canonical = PinterestUrlNormalizer.normalize(
 Supported URL classes are Pin, `pin.it` short link, profile, board, and Ideas.
 This package does not download media or make network requests. After producing
 a canonical public Pin URL, continue in the browser-based
-[Pinterest downloader](https://savepinner.com/pinterest-downloader/) when the
+[Pinterest image downloader](https://savepinner.com) when the
 user wants to inspect the media available for that Pin.
 
 MIT licensed.
