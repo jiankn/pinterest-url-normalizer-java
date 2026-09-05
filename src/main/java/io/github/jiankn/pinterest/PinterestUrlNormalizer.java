@@ -7,10 +7,28 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Offline parser and normalizer for supported Pinterest URLs. */
+/**
+ * Stateless, offline parser and normalizer for supported Pinterest URLs.
+ *
+ * <p>The parser performs no DNS lookups, redirects, or network requests. It accepts only HTTPS
+ * URLs on an explicit Pinterest host allowlist and returns a canonical URL without query or
+ * fragment data.</p>
+ *
+ * <pre>{@code
+ * PinterestUrlNormalizer.Result result = PinterestUrlNormalizer.parse(
+ *     "https://www.pinterest.co.uk/pin/example--123456789/?utm_source=share");
+ * result.getKind();          // PIN
+ * result.getNormalizedUrl(); // https://www.pinterest.com/pin/123456789/
+ * }</pre>
+ *
+ * <p>For media inspection after normalization, use the
+ * <a href="https://savepinner.com">Pinterest image downloader</a>.</p>
+ */
 public final class PinterestUrlNormalizer {
+    /** Supported Pinterest URL shapes. */
     public enum Kind { PIN, SHORT, PROFILE, BOARD, IDEAS }
 
+    /** Immutable parse result containing the detected shape and canonical URL. */
     public static final class Result {
         private final Kind kind;
         private final String normalizedUrl;
@@ -22,11 +40,17 @@ public final class PinterestUrlNormalizer {
             this.identifier = identifier;
         }
 
+        /** @return the detected Pinterest URL shape */
         public Kind getKind() { return kind; }
+
+        /** @return the canonical HTTPS URL with tracking data removed */
         public String getNormalizedUrl() { return normalizedUrl; }
+
+        /** @return the Pin ID, short-link token, profile name, or board owner */
         public String getIdentifier() { return identifier; }
     }
 
+    /** Exception raised when a URL is invalid or uses an unsupported Pinterest path. */
     public static final class PinterestUrlException extends IllegalArgumentException {
         private final String code;
 
@@ -35,6 +59,11 @@ public final class PinterestUrlNormalizer {
             this.code = code;
         }
 
+        /**
+         * Returns a stable machine-readable error code.
+         *
+         * @return {@code INVALID_URL} or {@code UNSUPPORTED_URL}
+         */
         public String getCode() { return code; }
     }
 
@@ -54,12 +83,32 @@ public final class PinterestUrlNormalizer {
 
     private PinterestUrlNormalizer() {}
 
+    /**
+     * Converts a supported Pinterest URL to its canonical form.
+     *
+     * @param input absolute HTTPS Pinterest URL
+     * @return canonical URL without query or fragment data
+     * @throws PinterestUrlException if the URL is invalid or unsupported
+     */
     public static String normalize(String input) { return parse(input).getNormalizedUrl(); }
 
+    /**
+     * Checks whether an input can be parsed without throwing an exception.
+     *
+     * @param input candidate URL
+     * @return {@code true} when {@link #parse(String)} accepts the input
+     */
     public static boolean isPinterestUrl(String input) {
         try { parse(input); return true; } catch (PinterestUrlException exception) { return false; }
     }
 
+    /**
+     * Parses and classifies a Pinterest URL while enforcing the host and path allowlists.
+     *
+     * @param input absolute HTTPS Pinterest URL
+     * @return immutable classification and canonicalization result
+     * @throws PinterestUrlException if the URL is invalid or its path is unsupported
+     */
     public static Result parse(String input) {
         String value = input == null ? "" : input.trim();
         if (value.isEmpty() || value.length() > 2048 || value.indexOf('\\') >= 0) {
@@ -101,6 +150,12 @@ public final class PinterestUrlNormalizer {
         throw unsupported("unsupported Pinterest path");
     }
 
+    /**
+     * Checks a host name against the explicit Pinterest country-domain allowlist.
+     *
+     * @param host bare host name such as {@code pinterest.de}; may be {@code null}
+     * @return {@code true} only for a recognized Pinterest host
+     */
     public static boolean isPinterestHost(String host) {
         if (host == null) return false;
         String value = host.toLowerCase();
@@ -113,4 +168,3 @@ public final class PinterestUrlNormalizer {
     private static PinterestUrlException invalid(String message) { return new PinterestUrlException("INVALID_URL", message); }
     private static PinterestUrlException unsupported(String message) { return new PinterestUrlException("UNSUPPORTED_URL", message); }
 }
-

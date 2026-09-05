@@ -8,7 +8,7 @@ credentials, non-HTTPS URLs, encoded paths, and non-standard ports.
 <dependency>
   <groupId>io.github.jiankn</groupId>
   <artifactId>pinterest-url-normalizer</artifactId>
-  <version>0.1.2</version>
+  <version>0.1.3</version>
 </dependency>
 ```
 
